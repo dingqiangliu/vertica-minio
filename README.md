@@ -24,14 +24,14 @@ All you need to do is just running `make`.
 
 * **/opt/vertica/bin/clustercli.sh** : shell commands to assisting cluster management.
 
-  * provide **cls_run**, **cls_cp** to run command and copy files in the whole cluster.
+  * provides **cls_run**, **cls_cp** to run command and copy files in the whole cluster.
 
-  * cluster members come from [/opt/vertica/config/admintools.config] or [/opt/vertica/config/minio.config].
+  * cluster members come from `/opt/vertica/config/admintools.conf`, `/opt/vertica/config/minio.conf`.
 
-  * linked to /etc/profiled/, so all users can use it directly in shell.
+  * links into /etc/profiled/, so all users can use it directly in shell.
 
 * TODO: monitoring tools.
 
 ## How to use them
 
-Pay attention to the NOTICE after install this package. You can read it again by issue **rpm --scripts -q minio** command.
+Pay attention to the NOTICE after install this package. You can read it again by issue `rpm --scripts -q minio` command.
