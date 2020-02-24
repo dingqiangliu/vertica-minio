@@ -1,0 +1,13 @@
+# Local export path.
+# MINIO_VOLUMES="http://server{1...16}:9000/data{1...8} http://server{17...32}:9000/data{1...8}"
+MINIO_VOLUMES="/data/minio"
+
+# Use if you want to run Minio on a custom port.
+MINIO_OPTS="--address :9000 --anonymous"
+
+# Auth credential for object storage and web access.
+MINIO_ACCESS_KEY="dbadmin"
+MINIO_SECRET_KEY="verticas3"
+
+# Enable or disable access to web UI.
+#MINIO_BROWSER=off

@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+.tags*
+._*
+*.iml
+.vscode/
+dist/
+SOURCES/bin/minio
+SOURCES/bin/mc
+SOURCES/bin/warp
+
+!.gitkeep
