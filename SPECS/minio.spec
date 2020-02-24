@@ -56,14 +56,19 @@ cp -a %{SOURCE2} %{buildroot}/%{_unitdir}/
 cat <<-'EOF'
 
 NOTICE: 
-1. before you start minio service, modify [/opt/vertica/config/minio.conf] as your situation.
-2. sync config file [/opt/vertica/config/minio.conf] to all servers as :
+1. the first thing is run [sudo /opt/vertica/sbin/install_vertica --hosts server1,server2,...] to check system and define cluster.
+2. before you start minio service, modify [/opt/vertica/config/minio.conf] as your situation.
+3. sync config file [/opt/vertica/config/minio.conf] to all servers as :
     cls_cp /opt/vertica/config/minio.conf /opt/vertica/config/
-3. start minio service on all servers as user [root] :
-    cls_run -b systemctl start minio.service
-    cls_run systemctl status minio.service
-    # toubleshooting: sudo journalctl -u minio
-    cls_run systemctl enable minio.service
+4. start minio service on all servers as :
+    # start service
+    cls_run --background sudo systemctl start minio.service
+    # show status of service
+    cls_run 'hostname; sudo systemctl status minio.service'
+    # troubleshoot acording to logs if require
+    cls_run 'hostname; sudo journalctl --no-pager -u minio -n 12'
+    # enable service start/restart dynamically
+    cls_run sudo systemctl enable minio.service
 EOF
 
 
