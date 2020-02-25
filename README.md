@@ -28,7 +28,7 @@ All you need to do is just running `make`.
 
   * cluster members come from `/opt/vertica/config/admintools.conf`, `/opt/vertica/config/minio.conf`.
 
-  * links into /etc/profiled/, so all users can use it directly in shell.
+  * links into /etc/profile.d/, so all users can use it directly in shell.
 
 * TODO: monitoring tools.
 
