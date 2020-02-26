@@ -1,4 +1,4 @@
-# !/bin/sh
+# !/usr/bin/env bash
 
 
 # breakpoint resume for scp
@@ -42,7 +42,7 @@ function _cls_getNodeList() {
 
 # copy file to other nodes in cluster
 function cls_cp() {
-  SELF="$(hostname)"
+  SELF="localhost.localdomain localhost4.localdomain4 localhost6.localdomain6 $(hostname -f) $(ifconfig | awk '/inet /{print $2}')"
   
   if [ -z "${NODE_LIST}" ]; then
     NODE_LIST="$(_cls_getNodeList)"
@@ -60,10 +60,10 @@ function cls_cp() {
 	return 1
   fi
   
-  if [[ "$1" = '--background' || "$1" == '-b' ]]; then
+  if [[ "$1" == '--background' || "$1" == '-b' ]]; then
     shift
     for i in ${NODE_LIST}; do
-      if [ ! "$i" = "$SELF" ]; then
+      if [[ ! "${SELF^^}" == *"${i^^}"* ]]; then
         if [ "$1" = "-r" ]; then
           scp -oStrictHostKeyChecking=no -r $2 $i:$3 &
         else
@@ -74,7 +74,7 @@ function cls_cp() {
     wait
   else
     for i in ${NODE_LIST}; do
-      if [ ! "$i" = "$SELF" ]; then
+      if [[ ! "${SELF^^}" == *"${i^^}"* ]]; then
         if [ "$1" = "-r" ]; then
           scp -oStrictHostKeyChecking=no -r $2 $i:$3
         else
@@ -106,7 +106,7 @@ function cls_run() {
 	return 1
   fi
   
-  if [[ "$1" = '--background' || "$1" == '-b' ]]; then
+  if [[ "$1" == '--background' || "$1" == '-b' ]]; then
     shift
     for i in ${NODE_LIST}; do
       ssh -oStrictHostKeyChecking=no -n $i "$@" &
