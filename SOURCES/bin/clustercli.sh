@@ -53,33 +53,44 @@ function cls_cp() {
     exit 1
   fi
 
-  if [[ "$1" == '' || ("$1" == '--background' || "$1" == '-b') && "$2" == ''  ]]; then
+  BACKGROUND=0; RECURSIVE=""; HELP=0
+  while [[ "$1" == '-'* ]] ; do
+    case "$1" in
+      -b|--background)
+        BACKGROUND=1
+        ;;
+      -r|--recursive)
+        RECURSIVE="-r"
+        ;;
+      -h|--help)
+        HELP=1
+        ;;
+    esac
+    shift
+  done
+
+  if [[ ${HELP} != 0 || "$1" == '' ]]; then
     cat <<-EOF >&2
-      Usage: ${FUNCNAME} [-b | --background] [-r] source target
+Usage: ${FUNCNAME} [OPTION]... source target
+Options:
+    -b --background, execute cmd in parallel.
+    -r --recursive, copy directory recursively
+    -h --help, show this usage info.
 	EOF
 	return 1
   fi
   
-  if [[ "$1" == '--background' || "$1" == '-b' ]]; then
-    shift
+  if [[ ${BACKGROUND} != 0 ]]; then
     for i in ${NODE_LIST}; do
       if [[ ! "${SELF^^}" == *"${i^^}"* ]]; then
-        if [ "$1" = "-r" ]; then
-          scp -oStrictHostKeyChecking=no -r $2 $i:$3 &
-        else
-          scp -oStrictHostKeyChecking=no $1 $i:$2 &
-        fi
+        scp -oStrictHostKeyChecking=no ${RECURSIVE} $1 $i:$2 &
       fi
     done
     wait
   else
     for i in ${NODE_LIST}; do
       if [[ ! "${SELF^^}" == *"${i^^}"* ]]; then
-        if [ "$1" = "-r" ]; then
-          scp -oStrictHostKeyChecking=no -r $2 $i:$3
-        else
-          scp -oStrictHostKeyChecking=no $1 $i:$2
-        fi
+        scp -oStrictHostKeyChecking=no ${RECURSIVE} $1 $i:$2
       fi
     done
   fi
@@ -99,21 +110,44 @@ function cls_run() {
     exit 1
   fi
 
-  if [[ "$1" == '' || ("$1" == '--background' || "$1" == '-b') && "$2" == ''  ]]; then
+  BACKGROUND=0; PREFIX=0; HELP=0
+  while [[ "$1" == '-'* ]] ; do
+    case "$1" in
+      -b|--background)
+        BACKGROUND=1
+        ;;
+      -p|--prefix)
+        PREFIX=1
+        ;;
+      -h|--help)
+        HELP=1
+        ;;
+    esac
+    shift
+  done
+
+  if [[ ${HELP} != 0 || "$1" == '' ]]; then
     cat <<-EOF >&2
-      Usage: ${FUNCNAME} [-b | --background] cmd ...
+Usage: ${FUNCNAME} [OPTION]... cmd
+Options:
+    -b --background, execute cmd in parallel.
+    -p --prefix, add [nodeName ] at the beginning of each output line.
+    -h --help, show this usage info.
 	EOF
 	return 1
   fi
   
-  if [[ "$1" == '--background' || "$1" == '-b' ]]; then
-    shift
+  if [[ ${BACKGROUND} != 0 ]]; then
     for i in ${NODE_LIST}; do
-      ssh -oStrictHostKeyChecking=no -n $i "$@" &
+      cmdPrefix=""
+      [[ ${PREFIX} != 0 ]] && cmdPrefix=" | sed 's/^/[${i}] /'"
+      ssh -oStrictHostKeyChecking=no -n $i "( $@ ) 2>&1 ${cmdPrefix}" &
     done
   else
     for i in ${NODE_LIST}; do
-      ssh -oStrictHostKeyChecking=no $i "$@"
+      cmdPrefix=""
+      [[ ${PREFIX} != 0 ]] && cmdPrefix=" | sed 's/^/[${i}] /'"
+      ssh -oStrictHostKeyChecking=no $i "( $@ ) 2>&1 ${cmdPrefix}"
     done
   fi
   wait
@@ -121,6 +155,6 @@ function cls_run() {
 alias cls_run=cls_run
 export -f cls_run
 
-
+# Note: set NODE_LIST to bypass admintools.conf or minio.conf
 # export NODE_LIST="v001 v002 v003"
 
