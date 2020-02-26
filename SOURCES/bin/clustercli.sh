@@ -25,7 +25,7 @@ export -f rscp
 # get nodes list from admintools.conf or minio.conf
 function _cls_getNodeList() {
   if [ -f /opt/vertica/config/admintools.conf ]; then
-    NODE_LIST="$(egrep -v '^\s*#' /opt/vertica/config/admintools.conf | grep hosts | awk -F '=' '{print $2}' | sed -e 's/\s//g' | tr ',' ' ')"
+    NODE_LIST="$(egrep -v '^\s*#' /opt/vertica/config/admintools.conf | egrep 'hosts\s*=' | awk -F '=' '{print $2}' | sed -e 's/\s//g' | tr ',' ' ')"
   fi
   if [ -z "${NODE_LIST}" -a -f /opt/vertica/config/minio.conf ]; then
     for zone in $(egrep -v '^\s*#' /opt/vertica/config/minio.conf | grep MINIO_VOLUMES | awk -F '=' '{print $2}') ; do
