@@ -86,7 +86,8 @@ EOF
 %attr(755, dbadmin, verticadba) /opt/vertica/bin/mc
 %attr(755, dbadmin, verticadba) /opt/vertica/bin/warp
 %attr(755, dbadmin, verticadba) /opt/vertica/bin/clustercli.sh
-/opt/vertica/config/minio.conf.default
+# reject access from others as there are MINIO_ACCESS_KEY and MINIO_SECRET_KEY
+%attr(600, dbadmin, verticadba) /opt/vertica/config/minio.conf.default
 
 %if 0%{?rhel} >= 7
 %attr(644, root, root) %{_unitdir}/minio.service
