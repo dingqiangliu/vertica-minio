@@ -527,7 +527,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    CREATE TABLE
 
    [dbadmin ~]# seq 1 1000000 | vsql -w myvertica -c "copy test from stdin"
-   [dbadmin ~]# seq 1 1000000 | vsql -w myvertica -c "select count(*) from test"
+   [dbadmin ~]# vsql -w myvertica -c "select count(*) from test"
      count
    ---------
     1000000
