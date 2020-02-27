@@ -1,5 +1,5 @@
 Name:           minio
-Version:        1.0.0
+Version:        1.0.1
 Release:        %{_minio_verson}.el%{_rhel_version}
 Vendor:         Minio, Inc.
 Summary:        Cloud Storage Server.
