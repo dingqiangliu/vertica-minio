@@ -486,7 +486,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    ```BASH
    [dbadmin ~]# echo "awsauth = dbadmin:verticas3" > auth_params.conf
    [dbadmin ~]# echo "awsendpoint = localhost:9000" >> auth_params.conf
-   [dbadmin ~]# echo "awsenablehttps = 0" > auth_params.conf
+   [dbadmin ~]# echo "awsenablehttps = 0" >> auth_params.conf
 
    [dbadmin ~]# cls_run -p mkdir -p /home/dbadmin/vmarteon_depot
    [dbadmin ~]# cls_run -p du -hs /home/dbadmin/vmarteon_depot
