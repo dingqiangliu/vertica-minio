@@ -12,15 +12,15 @@ All you need to do is just running `make`.
 
 ## Directory structure
 
-* **/opt/vertica/bin/minio** : minio server.
+* **/opt/vertica/bin/minio** : Minio server.
 
-* **/opt/vertica/bin/mc** : [minio client](https://github.com/minio/mc) to manage or access S3 storage.
+* **/opt/vertica/bin/mc** : [Minio client](https://github.com/minio/mc) to manage or access S3 storage.
 
 * **/opt/vertica/bin/warp** : [benchmark tool for S3 storage](https://github.com/minio/warp).
 
-* **/usr/lib/systemd/system/minio.service** : minio serivce for systemd.
+* **/usr/lib/systemd/system/minio.service** : Minio serivce for systemd.
 
-* **/opt/vertica/config/minio.conf.default** : minio config file template.
+* **/opt/vertica/config/minio.conf.default** : Minio config file template.
 
 * **/opt/vertica/bin/clustercli.sh** : shell commands to assisting cluster management.
 
@@ -66,7 +66,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    Installation complete.
    ```
 
-3. download the latest minio rpm package from this repository and install it on one server.
+3. download the latest Minio rpm package from this repository and install it on one server.
 
    ```BASH
    [adminUser ~]# sudo rpm -Uvh /tmp/minio-1.0.0-20200220225123.el7.x86_64.rpm
@@ -76,7 +76,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    ...
    ```
 
-4. copy minio package and install it to other servers.
+4. copy Minio package and install it to other servers.
 
    ```BASH
    [adminUser ~]# cls_cp vertica/minio-1.0.0-20200220225123.el7.x86_64.rpm /tmp/
@@ -109,11 +109,20 @@ Pay attention to the NOTICE after install this package. You can read it again by
    [192.168.33.107]     cls_run sudo systemctl enable minio.service
    ```
 
-5. set paramenters of minio
+5. set paramenters of Minio
+
+   Prepare disks and file systems for Minio.
+
+   **Note**: dedicated disks for Minio are recommended. But we do not have in this demo. Suppose you have 12 disks each server mounted as /data1~12, just replace following `/home/minio{1...4}` as `/data1{1...12}`.
 
    ```BASH
    [adminUser ~]# cls_run -p sudo mkdir -p /home/minio{1..4}
    [adminUser ~]# cls_run -p sudo chown -R dbadmin:verticadba /home/minio{1..4}
+   ```
+
+   Change paramenters of Minio service.
+
+   ```BASH
    [adminUser ~]# cls_run -p sudo -u dbadmin "sed -i -e 's/^\s*MINIO_VOLUMES\s*=.*$/MINIO_VOLUMES=\"http:\/\/192.168.33.{105...107}:9000\/home\/minio{1...4}\"/g' /opt/vertica/config/minio.conf"
    [adminUser ~]# cls_run -p sudo -u dbadmin egrep '^\s*MINIO_VOLUMES\s*=' /opt/vertica/config/minio.conf
    [192.168.33.105] MINIO_VOLUMES="http://192.168.33.{105...107}:9000/home/minio{1...4}"
@@ -133,13 +142,13 @@ Pay attention to the NOTICE after install this package. You can read it again by
    [192.168.33.107] MINIO_SECRET_KEY="verticas3"
    ```
 
-6. satrt minio service
+6. satrt Minio service
 
    ```BASH
    [adminUser ~]# cls_run --background sudo systemctl start minio.service
    ```
 
-   Show status of minio service.
+   Show status of Minio service.
 
    ```BASH
    [adminUser ~]# cls_run -p sudo systemctl status minio.service
@@ -522,6 +531,8 @@ Pay attention to the NOTICE after install this package. You can read it again by
    ```
 
 2. create Eon mode database.
+
+   **Note**: dedicated servers for Vertica are recommended. But we do not have in this demo. Replace following `localhost` as real host names or IPs of your Minio servers.
 
    ```BASH
    [dbadmin ~]# echo "awsauth = dbadmin:verticas3" > auth_params.conf
