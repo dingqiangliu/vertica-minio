@@ -238,7 +238,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
 
 ### Example 2: benchmark S3 storage
 
-1. vioperf on filesystem
+1. vioperf on filesystem, and vioperf on networking
 
    ```BASH
    [dbadmin ~]# cls_run -b -p /opt/vertica/bin/vioperf /home 2>/dev/null
@@ -260,6 +260,46 @@ Pay attention to the NOTICE after install this package. You can read it again by
    [192.168.33.105] ReWrite   | /home              | (MB-read+MB-write)/s| 323+323             | 323+323                         | 40.375+40.375       | 40.375+40.375                   | 8             | 14    | 78        | 10              | 65
    [192.168.33.105] Read      | /home              | MB/s                | 720                 | 763                             | 90                  | 95.375                          | 8             | 34    | 62        | 40              | 35
    [192.168.33.105] SkipRead  | /home              | seeks/s             | 1177                | 1243                            | 147.125             | 155.375                         | 8             | 0     | 81        | 30              | 45
+
+   [dbadmin ~]$ vnetperf
+   The maximum recommended rtt latency is 2 milliseconds. The ideal rtt latency is 200 microseconds or less. It is recommended that clock skew be kept to under 1 second.
+   test              | date                    | node             | index | rtt latency (us)  | clock skew (us)
+   -------------------------------------------------------------------------------------------------------------------------
+   latency           | 2020-02-26_23:35:42,304 | 192.168.33.105   | 0     | 41                | 0
+   latency           | 2020-02-26_23:35:42,304 | 192.168.33.106   | 1     | 95                | 1351
+   latency           | 2020-02-26_23:35:42,304 | 192.168.33.107   | 2     | 104               | 1290
+
+   The minimum recommended throughput is 100 MB/s. Ideal throughput is 800 MB/s or more. Note: UDP numbers may be lower, multiple network switches may reduce performance results.
+   date                    | test              | rate limit (MB/s) | node             | MB/s (sent) | MB/s (rec)  | bytes (sent)        | bytes (rec)         | duration (s)
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   2020-02-26_23:35:42,306 | udp-throughput    | 32                | average          | 30.5153     | 30.5153     | 32002261            | 32002261            | 1.00015
+   2020-02-26_23:35:43,307 | udp-throughput    | 64                | average          | 61.0286     | 61.0286     | 64002560            | 64002560            | 1.00015
+   2020-02-26_23:35:44,308 | udp-throughput    | 128               | average          | 122.057     | 122.057     | 128001685           | 128001685           | 1.00012
+   2020-02-26_23:35:45,309 | udp-throughput    | 256               | average          | 244.11      | 244.11      | 256001408           | 256001408           | 1.00013
+   2020-02-26_23:35:46,310 | udp-throughput    | 512               | average          | 438.032     | 437.455     | 459398933           | 458790997           | 1.00019
+   2020-02-26_23:35:47,311 | udp-throughput    | 640               | average          | 482.064     | 441.4       | 505629546           | 462986197           | 1.00031
+   2020-02-26_23:35:48,312 | udp-throughput    | 768               | average          | 406.041     | 347.125     | 425957056           | 364151210           | 1.00051
+   2020-02-26_23:35:49,314 | udp-throughput    | 1024              | 192.168.33.105   | 759.878     | 336.581     | 796980544           | 353015040           | 1.00024
+   2020-02-26_23:35:49,314 | udp-throughput    | 1024              | 192.168.33.106   | 332.769     | 551.1       | 349229056           | 578360576           | 1.00085
+   2020-02-26_23:35:49,314 | udp-throughput    | 1024              | 192.168.33.107   | 378.137     | 420.239     | 396960128           | 441158400           | 1.00115
+   2020-02-26_23:35:49,314 | udp-throughput    | 1024              | average          | 490.261     | 435.973     | 514389909           | 457511338           | 1.00074
+   2020-02-26_23:35:50,316 | udp-throughput    | 2048              | average          | 498.404     | 457.557     | 522858325           | 480273856           | 1.00083
+
+   The minimum recommended throughput is 100 MB/s. Ideal throughput is 800 MB/s or more. Note: UDP numbers may be lower, multiple network switches may reduce performance results.
+   date                    | test              | rate limit (MB/s) | node             | MB/s (sent) | MB/s (rec)  | bytes (sent)        | bytes (rec)         | duration (s)
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   2020-02-26_23:35:51,318 | tcp-throughput    | 32                | average          | 30.5795     | 30.5795     | 32112640            | 32112640            | 1.00149
+   2020-02-26_23:35:53,322 | tcp-throughput    | 64                | average          | 61.0966     | 61.0966     | 64094208            | 64094208            | 1.00047
+   2020-02-26_23:35:55,324 | tcp-throughput    | 128               | average          | 122.131     | 122.131     | 128122880           | 128122880           | 1.00047
+   2020-02-26_23:35:57,326 | tcp-throughput    | 256               | average          | 244.196     | 244.196     | 256114688           | 256114688           | 1.00022
+   2020-02-26_23:35:59,327 | tcp-throughput    | 512               | average          | 488.336     | 488.336     | 512098304           | 512098304           | 1.00008
+   2020-02-26_23:36:01,329 | tcp-throughput    | 640               | average          | 610.407     | 610.407     | 640090112           | 640090112           | 1.00005
+   2020-02-26_23:36:03,331 | tcp-throughput    | 768               | average          | 732.477     | 732.477     | 768081920           | 768081920           | 1.00003
+   2020-02-26_23:36:05,332 | tcp-throughput    | 1024              | 192.168.33.105   | 971.721     | 976.094     | 1019478016          | 1024065536          | 1.00054
+   2020-02-26_23:36:05,332 | tcp-throughput    | 1024              | 192.168.33.106   | 976.618     | 967.243     | 1024065536          | 1014235136          | 1.00001
+   2020-02-26_23:36:05,332 | tcp-throughput    | 1024              | 192.168.33.107   | 976.599     | 976.599     | 1024065536          | 1024065536          | 1.00003
+   2020-02-26_23:36:05,332 | tcp-throughput    | 1024              | average          | 974.979     | 973.312     | 1022536362          | 1020788736          | 1.00019
+   2020-02-26_23:36:07,335 | tcp-throughput    | 2048              | average          | 1069.25     | 1067.93     | 1123046741          | 1121648640          | 1.00165
    ```
 
 2. warp on s3
