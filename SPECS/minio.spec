@@ -108,32 +108,6 @@ EOF
 %endif
 
 %attr(755, dbadmin, verticadba) /opt/vertica/bin/ddstat
-%attr(755, dbadmin, verticadba) /opt/vertica/ddstat/ddstat.py
-/opt/vertica/ddstat/apipkg.py
-/opt/vertica/ddstat/cluster.py
-/opt/vertica/ddstat/ddstat.py
-/opt/vertica/ddstat/dstat.py
-/opt/vertica/ddstat/dstatproxy.py
-/opt/vertica/ddstat/execnet/__init__.py
-/opt/vertica/ddstat/execnet/_version.py
-/opt/vertica/ddstat/execnet/deprecated.py
-/opt/vertica/ddstat/execnet/gateway.py
-/opt/vertica/ddstat/execnet/gateway_base.py
-/opt/vertica/ddstat/execnet/gateway_bootstrap.py
-/opt/vertica/ddstat/execnet/gateway_io.py
-/opt/vertica/ddstat/execnet/gateway_socket.py
-/opt/vertica/ddstat/execnet/multi.py
-/opt/vertica/ddstat/execnet/rsync.py
-/opt/vertica/ddstat/execnet/rsync_remote.py
-/opt/vertica/ddstat/execnet/script/__init__.py
-/opt/vertica/ddstat/execnet/script/loop_socketserver.py
-/opt/vertica/ddstat/execnet/script/quitserver.py
-/opt/vertica/ddstat/execnet/script/shell.py
-/opt/vertica/ddstat/execnet/script/socketserver.py
-/opt/vertica/ddstat/execnet/script/socketserverservice.py
-/opt/vertica/ddstat/execnet/script/xx.py
-/opt/vertica/ddstat/execnet/xspec.py
-/opt/vertica/ddstat/util/__init__.py
-/opt/vertica/ddstat/util/reflection.py
+%attr(755, dbadmin, verticadba) /opt/vertica/ddstat
 
 %doc ../../README.md
