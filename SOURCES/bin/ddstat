@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) 2017 - 2020
+# Description: cluster monitoring
+# Author: DingQiang Liu
+
+[ -z "${NODE_LIST}" ] && [ "function" = "$(LC_ALL=C type -t _cls_getNodeList)" ] && _cls_getNodeList
+
+ScriptDir=$(cd "$(dirname $0)"; pwd)
+SitePackagesDir="${ScriptDir}/../ddstat"
+export PYTHONPATH="${SitePackagesDir}":${PYTHONPATH}
+PYTHON="$(which python2)"
+
+if [ "$(${PYTHON} -c 'import sys; print sys.version_info >= (2,7)')" != "True" ] ; then
+  echo "python 2.7+ is required!"
+  exit 1
+fi
+
+# redirect stderr to /dev/null to hide "Killed by signal 2." messages of ssh sub process when SIGINT.
+"${PYTHON}" ${SitePackagesDir}/ddstat.py "$@" 2>/dev/null
+

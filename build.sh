@@ -65,7 +65,10 @@ minio_verson="$("${repo_dir}/SOURCES/bin/minio" --version | awk '{print $3}' | s
 mkdir "${HOME}/rpmbuild"
 cp -a ${repo_dir}/SPECS ${HOME}/rpmbuild/
 cp -a ${repo_dir}/SOURCES ${HOME}/rpmbuild/
-find ${HOME}/rpmbuild/ -name .DS_Store -delete
+cp -a ${repo_dir}/README.md ${HOME}/rpmbuild/
+find ${HOME}/rpmbuild/SOURCES/ -name '.*' -exec rm -rf '{}' \; 2>/dev/null
+find ${HOME}/rpmbuild/SOURCES/ -name '*.pyc' -delete
+find ${HOME}/rpmbuild/SOURCES/ -name '*.pyo' -delete
 
 cd ${HOME}
 rpmbuild -bb \

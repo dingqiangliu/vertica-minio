@@ -1,5 +1,5 @@
 Name:           minio
-Version:        1.0.1
+Version:        1.0.2
 Release:        %{_minio_verson}.el%{_rhel_version}
 Vendor:         Minio, Inc.
 Summary:        Cloud Storage Server.
@@ -8,6 +8,7 @@ Group:          Applications/File
 Source0:        bin
 Source1:        config
 Source2:        minio.service
+Source3:        ddstat
 URL:            https://www.minio.io/
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -17,13 +18,24 @@ Requires:       systemd
 %endif
 Requires(pre): shadow-utils, vertica >= 9.2.1-0
 
-
 %description
 Minio is an object storage server released under Apache License v2.0.
 It is compatible with Amazon S3 cloud storage service. It is best
 suited for storing unstructured data such as photos, videos, log
 files, backups and container / VM images. Size of an object can
 range from a few KBs to a maximum of 5TB.
+
+## Turn off auto-compilation of Python files outside Python specific paths,
+## so there's no risk that unexpected "__python" macro gets picked to do the
+## RPM-native byte-compiling there (only "{_datadir}/pacemaker/tests" affected)
+## -- distro-dependent tricks or automake's fallback to be applied there
+%if %{defined _python_bytecompile_extra}
+%global _python_bytecompile_extra 0
+%else
+### the statement effectively means no RPM-native byte-compiling will occur at
+### all, so distro-dependent tricks for Python-specific packages to be applied
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+%endif
 
 
 %clean
@@ -43,6 +55,8 @@ cp -a %{SOURCE1} %{buildroot}/opt/vertica/
 mkdir -p %{buildroot}/%{_unitdir}
 cp -a %{SOURCE2} %{buildroot}/%{_unitdir}/
 %endif
+
+cp -a %{SOURCE3} %{buildroot}/opt/vertica/
 
 
 %post
@@ -93,3 +107,33 @@ EOF
 %attr(644, root, root) %{_unitdir}/minio.service
 %endif
 
+%attr(755, dbadmin, verticadba) /opt/vertica/bin/ddstat
+%attr(755, dbadmin, verticadba) /opt/vertica/ddstat/ddstat.py
+/opt/vertica/ddstat/apipkg.py
+/opt/vertica/ddstat/cluster.py
+/opt/vertica/ddstat/ddstat.py
+/opt/vertica/ddstat/dstat.py
+/opt/vertica/ddstat/dstatproxy.py
+/opt/vertica/ddstat/execnet/__init__.py
+/opt/vertica/ddstat/execnet/_version.py
+/opt/vertica/ddstat/execnet/deprecated.py
+/opt/vertica/ddstat/execnet/gateway.py
+/opt/vertica/ddstat/execnet/gateway_base.py
+/opt/vertica/ddstat/execnet/gateway_bootstrap.py
+/opt/vertica/ddstat/execnet/gateway_io.py
+/opt/vertica/ddstat/execnet/gateway_socket.py
+/opt/vertica/ddstat/execnet/multi.py
+/opt/vertica/ddstat/execnet/rsync.py
+/opt/vertica/ddstat/execnet/rsync_remote.py
+/opt/vertica/ddstat/execnet/script/__init__.py
+/opt/vertica/ddstat/execnet/script/loop_socketserver.py
+/opt/vertica/ddstat/execnet/script/quitserver.py
+/opt/vertica/ddstat/execnet/script/shell.py
+/opt/vertica/ddstat/execnet/script/socketserver.py
+/opt/vertica/ddstat/execnet/script/socketserverservice.py
+/opt/vertica/ddstat/execnet/script/xx.py
+/opt/vertica/ddstat/execnet/xspec.py
+/opt/vertica/ddstat/util/__init__.py
+/opt/vertica/ddstat/util/reflection.py
+
+%doc ../../README.md

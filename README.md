@@ -30,7 +30,13 @@ All you need to do is just running `make`.
 
   * links into /etc/profile.d/, so all users can use it directly in shell.
 
-* TODO: monitoring tools.
+* **/opt/vertica/bin/ddstat** : distributed version of [dstat](https://github.com/dagwieers/dstat) for monitoring cluster.
+
+  * automatically get cluster members from /opt/vertica/bin/clustercli.sh.
+
+  * show timestamp and node name, support `--output csvFile` to export all measures for later analysis.
+
+  * TODO: plugin `--minio` for concurrency, errors and other measures of each Minio service.
 
 ## How to use them
 
@@ -113,7 +119,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
 
    Prepare disks and file systems for Minio.
 
-   **Note**: dedicated disks for Minio are recommended. But we do not have in this demo. Suppose you have 12 disks each server mounted as /data1~12, just replace following `/home/minio{1...4}` as `/data1{1...12}`.
+   **Note**: dedicated disks for Minio are recommended. But we do not have in this demo. Suppose you have 12 disks each server mounted as /data1~12, just replace following `/home/minio{1...4}` as `/data{1...12}`.
 
    ```BASH
    [adminUser ~]# cls_run -p sudo mkdir -p /home/minio{1..4}
@@ -527,7 +533,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    Bucket created successfully `mys3/vmarteon`.
 
    [dbadmin ~]# mc du mys3/vmarteon
-   0B	vmarteon
+   0B    vmarteon
    ```
 
 2. create Eon mode database.
@@ -541,9 +547,9 @@ Pay attention to the NOTICE after install this package. You can read it again by
 
    [dbadmin ~]# cls_run -p mkdir -p /home/dbadmin/vmarteon_depot
    [dbadmin ~]# cls_run -p du -hs /home/dbadmin/vmarteon_depot
-   [192.168.33.105] 4.0K	/home/dbadmin/vmarteon_depot
-   [192.168.33.106] 4.0K	/home/dbadmin/vmarteon_depot
-   [192.168.33.107] 4.0K	/home/dbadmin/vmarteon_depot
+   [192.168.33.105] 4.0K    /home/dbadmin/vmarteon_depot
+   [192.168.33.106] 4.0K    /home/dbadmin/vmarteon_depot
+   [192.168.33.107] 4.0K    /home/dbadmin/vmarteon_depot
 
    [dbadmin ~]# admintools -t create_db -x auth_params.conf \
                 --communal-storage-location=s3://vmarteon \
@@ -601,45 +607,45 @@ Pay attention to the NOTICE after install this package. You can read it again by
    (3 rows)
 
    [dbadmin ~]# cls_run -p "du -hs /home/dbadmin/vmarteon/* /home/dbadmin/vmarteon_depot/*"
-   [192.168.33.105] 16K	/home/dbadmin/vmarteon/dbLog
-   [192.168.33.105] 4.0K	/home/dbadmin/vmarteon/port.dat
-   [192.168.33.105] 4.0K	/home/dbadmin/vmarteon/procedures
-   [192.168.33.105] 1.2G	/home/dbadmin/vmarteon/v_vmarteon_node0001_catalog
-   [192.168.33.105] 8.0K	/home/dbadmin/vmarteon/v_vmarteon_node0001_data
-   [192.168.33.105] 460K	/home/dbadmin/vmarteon_depot/vmarteon
-   [192.168.33.106] 8.0K	/home/dbadmin/vmarteon/dbLog
-   [192.168.33.106] 4.0K	/home/dbadmin/vmarteon/port.dat
-   [192.168.33.106] 4.0K	/home/dbadmin/vmarteon/procedures
-   [192.168.33.106] 1.2G	/home/dbadmin/vmarteon/v_vmarteon_node0002_catalog
-   [192.168.33.106] 4.0K	/home/dbadmin/vmarteon/v_vmarteon_node0002_data
-   [192.168.33.106] 348K	/home/dbadmin/vmarteon_depot/vmarteon
-   [192.168.33.107] 8.0K	/home/dbadmin/vmarteon/dbLog
-   [192.168.33.107] 4.0K	/home/dbadmin/vmarteon/port.dat
-   [192.168.33.107] 4.0K	/home/dbadmin/vmarteon/procedures
-   [192.168.33.107] 1.2G	/home/dbadmin/vmarteon/v_vmarteon_node0003_catalog
-   [192.168.33.107] 4.0K	/home/dbadmin/vmarteon/v_vmarteon_node0003_data
-   [192.168.33.107] 348K	/home/dbadmin/vmarteon_depot/vmarteon
+   [192.168.33.105] 16K    /home/dbadmin/vmarteon/dbLog
+   [192.168.33.105] 4.0K    /home/dbadmin/vmarteon/port.dat
+   [192.168.33.105] 4.0K    /home/dbadmin/vmarteon/procedures
+   [192.168.33.105] 1.2G    /home/dbadmin/vmarteon/v_vmarteon_node0001_catalog
+   [192.168.33.105] 8.0K    /home/dbadmin/vmarteon/v_vmarteon_node0001_data
+   [192.168.33.105] 460K    /home/dbadmin/vmarteon_depot/vmarteon
+   [192.168.33.106] 8.0K    /home/dbadmin/vmarteon/dbLog
+   [192.168.33.106] 4.0K    /home/dbadmin/vmarteon/port.dat
+   [192.168.33.106] 4.0K    /home/dbadmin/vmarteon/procedures
+   [192.168.33.106] 1.2G    /home/dbadmin/vmarteon/v_vmarteon_node0002_catalog
+   [192.168.33.106] 4.0K    /home/dbadmin/vmarteon/v_vmarteon_node0002_data
+   [192.168.33.106] 348K    /home/dbadmin/vmarteon_depot/vmarteon
+   [192.168.33.107] 8.0K    /home/dbadmin/vmarteon/dbLog
+   [192.168.33.107] 4.0K    /home/dbadmin/vmarteon/port.dat
+   [192.168.33.107] 4.0K    /home/dbadmin/vmarteon/procedures
+   [192.168.33.107] 1.2G    /home/dbadmin/vmarteon/v_vmarteon_node0003_catalog
+   [192.168.33.107] 4.0K    /home/dbadmin/vmarteon/v_vmarteon_node0003_data
+   [192.168.33.107] 348K    /home/dbadmin/vmarteon_depot/vmarteon
 
    [dbadmin ~]# mc du --depth=2  mys3/vmarteon/
-   115B	vmarteon/157
-   131B	vmarteon/1c2
-   118B	vmarteon/3cc
-   38B	vmarteon/50d
-   146B	vmarteon/6c2
-   38B	vmarteon/7a1
-   41B	vmarteon/7f2
-   33B	vmarteon/8af
-   145B	vmarteon/94e
-   34B	vmarteon/997
-   91B	vmarteon/9c5
-   133B	vmarteon/a2d
-   332KiB	vmarteon/a65
-   61B	vmarteon/c27
-   40B	vmarteon/d2e
-   145B	vmarteon/d73
-   332KiB	vmarteon/d9e
-   61B	vmarteon/eba
-   333KiB	vmarteon/edb
-   581MiB	vmarteon/metadata
-   582MiB	vmarteon
+   115B    vmarteon/157
+   131B    vmarteon/1c2
+   118B    vmarteon/3cc
+   38B    vmarteon/50d
+   146B    vmarteon/6c2
+   38B    vmarteon/7a1
+   41B    vmarteon/7f2
+   33B    vmarteon/8af
+   145B    vmarteon/94e
+   34B    vmarteon/997
+   91B    vmarteon/9c5
+   133B    vmarteon/a2d
+   332KiB    vmarteon/a65
+   61B    vmarteon/c27
+   40B    vmarteon/d2e
+   145B    vmarteon/d73
+   332KiB    vmarteon/d9e
+   61B    vmarteon/eba
+   333KiB    vmarteon/edb
+   581MiB    vmarteon/metadata
+   582MiB    vmarteon
    ```

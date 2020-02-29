@@ -3,6 +3,8 @@ Thumbs.db
 .tags*
 ._*
 *.iml
+*.pyc
+*.pyo
 .vscode/
 dist/
 SOURCES/bin/minio
