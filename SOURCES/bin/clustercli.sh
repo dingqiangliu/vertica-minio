@@ -6,7 +6,7 @@ function rscp() {
   if [ -z "$1" -o -z "$2" ] ; then
     echo
     echo "Usage: rscp src target" >&2
-    exit 1
+    return 1
   else
     while true ; do
       rsync -v -P -r -e "ssh "  
@@ -23,7 +23,7 @@ export -f rscp
 
 
 # get nodes list from admintools.conf or minio.conf
-function _cls_getNodeList() {
+function cls_getNodeList() {
   if [ -f /opt/vertica/config/admintools.conf ]; then
     NODE_LIST="$(egrep -v '^\s*#' /opt/vertica/config/admintools.conf | egrep 'hosts\s*=' | awk -F '=' '{print $2}' | sed -e 's/\s//g' | tr ',' ' ')"
   fi
@@ -36,21 +36,21 @@ function _cls_getNodeList() {
       NODE_LIST="${NODE_LIST} ${zlist}"
     done
   fi
-
   echo -n "${NODE_LIST}"
 }
+export -f cls_getNodeList
 
 # copy file to other nodes in cluster
 function cls_cp() {
   SELF="localhost.localdomain localhost4.localdomain4 localhost6.localdomain6 $(hostname -f) $(ifconfig | awk '/inet /{print $2}')"
   
   if [ -z "${NODE_LIST}" ]; then
-    NODE_LIST="$(_cls_getNodeList)"
+    NODE_LIST="$(cls_getNodeList)"
   fi
   if [ -z "${NODE_LIST}" ]; then
     echo
     echo "Error: NODE_LIST environment variable must be set!" >&2
-    exit 1
+    return 1
   fi
 
   BACKGROUND=0; RECURSIVE=""; HELP=0
@@ -102,12 +102,12 @@ export -f cls_cp
 # run on all nodes in cluster
 function cls_run() {
   if [ -z "${NODE_LIST}" ]; then
-    NODE_LIST="$(_cls_getNodeList)"
+    NODE_LIST="$(cls_getNodeList)"
   fi
   if [ -z "${NODE_LIST}" ]; then
     echo
     echo "Error: NODE_LIST environment variable must be set!" >&2
-    exit 1
+    return 1
   fi
 
   BACKGROUND=0; PREFIX=0; HELP=0

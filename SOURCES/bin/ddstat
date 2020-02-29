@@ -4,7 +4,8 @@
 # Description: cluster monitoring
 # Author: DingQiang Liu
 
-[ -z "${NODE_LIST}" ] && [ "function" = "$(LC_ALL=C type -t _cls_getNodeList)" ] && _cls_getNodeList
+[ -z "${NODE_LIST}" ] && [ "function" = "$(LC_ALL=C type -t cls_getNodeList)" ] && NODE_LIST="$(cls_getNodeList)"
+export NODE_LIST
 
 ScriptDir=$(cd "$(dirname $0)"; pwd)
 SitePackagesDir="${ScriptDir}/../ddstat"
