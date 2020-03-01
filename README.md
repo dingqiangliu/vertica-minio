@@ -1,10 +1,38 @@
 # Minio toolkit for Vertica
 
-[Minio](https://github.com/minio/minio) and related tools for Vertica.
+[Minio](https://github.com/minio/minio) and related tools for Vertica customers, including servcie, client, cluster management and monitoring tools.
 
-## Build
+It will save your time to setup and maintain Minio cluster.
 
-All you need to do is just running `make`.
+## How to use
+
+1. After download and install this package, the first thing is running [sudo `/opt/vertica/sbin/install_vertica` --hosts server1,server2,...] to check system and define cluster.
+
+2. Before you start minio service, modify [/opt/vertica/config/minio.conf] according to your situation.
+
+3. Sync config file [/opt/vertica/config/minio.conf] to all servers as :
+
+   ```BASH
+    cls_cp /opt/vertica/config/minio.conf /opt/vertica/config/
+    ```
+
+4. Start minio service on all servers as :
+
+   ```BASH
+   # start service
+   cls_run --background sudo systemctl start minio.service
+
+   # show status of service
+   cls_run 'sudo systemctl status minio.service'
+
+   # troubleshoot acording to logs if need
+   cls_run -p 'sudo journalctl --no-pager -u minio'
+
+   # enable service start/restart dynamically
+   cls_run sudo systemctl enable minio.service
+   ```
+
+   **NOTICE**: You can read this document by issue `less $(rpm -dq minio)` command after this package has been installed.
 
 ## Supported Platforms
 
@@ -32,15 +60,46 @@ All you need to do is just running `make`.
 
 * **/opt/vertica/bin/ddstat** : distributed version of [dstat](https://github.com/dagwieers/dstat) for monitoring cluster.
 
-  * automatically get cluster members from /opt/vertica/bin/clustercli.sh.
+  * automatically get cluster members from /opt/vertica/bin/clustercli.sh, same as **cls_run** and **cls_cp**.
+
+  * automatically get configurations of Minio servcie come from `/opt/vertica/config/minio.conf`.
 
   * show timestamp and node name, support `--output csvFile` to export all measures for later analysis.
 
-  * TODO: plugin `--minio` for concurrency, errors and other measures of each Minio service.
+  * plugin `--minio` for availability and resource used by each Minio service.
 
-## How to use them
+    * **dwn**: show availability of Minio service, "0" means available, "1" means down.
 
-Pay attention to the NOTICE after install this package. You can read it again by issue `rpm --scripts -q minio` command.
+    * **mem**: means RSS memory of minio process.
+
+  * plugin `--minio-adv` for concurrency, errors of GET/PUT/PUT\_PARTs operations on each Minio service.
+
+    * **gtc**: concurrent get object operations running at now.
+
+    * **ptc**: concurrent put object operations running at now.
+
+    * **ppc**: concurrent put object with multiple parts operations running at now.
+
+    * **gte**: errors of get object operation happened since last restar.
+
+    * **pte**: errors of put object operation happened since last restar.
+
+    * **ppe**: errors of put object with multiple parts operation happened since last restar.
+
+    Here is an example when monitoring a Minio cluster:
+
+    ```BASH
+    [dbadmin ~]# ddstat -cmdn --minio --minio-adv
+    ----system---- -----node----- --total-cpu-usage-- ------memory-usage----- -dsk/total- -net/total- ---minio--- -------minio-adv-------
+         time     |     name     |usr sys idl wai stl| used  free  buff  cach| read  writ| recv  send| dwn   mem |gtc ptc ppc gte pte ppe
+    01-03 07:25:48|192.168.33.105| 56  13  27   4   0|5926M 29.2G  231M 27.5G|  75k  934M| 889M  890M|   0  1418M|  0   9   0   0   0   0
+    01-03 07:25:48|192.168.33.106| 57  13  25   5   0|5559M 29.6G  237M 27.5G| 203k  890M| 894M  910M|   0  1388M|  0   8   0   0   0   0
+    01-03 07:25:48|192.168.33.107| 56  14  23   7   0|5307M 28.7G  235M 28.7G|  96k  920M| 895M  874M|   0  1323M|  0   7   0   0   0   0
+    ```
+
+## Build from source
+
+All you need to do is just running `make`. It will download the latest versions of tools and package them to a single RPM package.
 
 ### Example 1: setup Minio S3 storage
 
@@ -50,7 +109,7 @@ Pay attention to the NOTICE after install this package. You can read it again by
    [adminUser ~]# sudo rpm -Uvh /tmp/vertica-9.3.1-2.x86_64.RHEL6.rpm
    ```
 
-2. leverage install_vertica to create cluster and adjust system parameter.
+2. leverage `install_vertica` to create cluster and adjust system parameter.
 
    ```BASH
    [adminUser ~]# sudo /opt/vertica/sbin/install_vertica --hosts 192.168.33.105,192.168.33.106,192.168.33.107 --rpm vertica-9.3.1-2.x86_64.RHEL6.rpm
@@ -393,16 +452,16 @@ Pay attention to the NOTICE after install this package. You can read it again by
     * Slowest: 1487.5MiB/s, 148.75 obj/s (1s, starting 18:28:18 EST)
 
 
-   Every 5.0s: /opt/vertica/bin/mondb.sh                          Wed Feb 26 18:26:36 2020
-
-   192.168.33.105: usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
-   192.168.33.105:  60  13  15   5   0   6|   0   460M| 458M  456M|   0     0 |  46k   24k
-   192.168.33.106:  64  15  10   5   0   6|   0   465M| 461M  433M|   0     0 |  42k   17k
-   192.168.33.107:  57  15  17   5   0   7|   0   469M| 448M  421M|   0     0 |  49k   20k
-   192.168.33.105: usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
-   192.168.33.105:  30  16  24  21   0   9| 295M    0 | 843M  807M|   0     0 |  97k   92k
-   192.168.33.106:  31  16  26  17   0   9| 299M    0 | 829M  829M|   0     0 |  88k   80k
-   192.168.33.107:  36  17  19  18   0   9| 290M    0 | 792M  846M|   0     0 |  82k   70k
+    -----node---   ----total-cpu-usage---  -dsk/total- -net/total- ---paging-- ---system--
+         name    | usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+   192.168.33.105|  60  13  15   5   0   6|   0   460M| 458M  456M|   0     0 |  46k   24k
+   192.168.33.106|  64  15  10   5   0   6|   0   465M| 461M  433M|   0     0 |  42k   17k
+   192.168.33.107|  57  15  17   5   0   7|   0   469M| 448M  421M|   0     0 |  49k   20k
+    -----node---   ----total-cpu-usage---  -dsk/total- -net/total- ---paging-- ---system--
+         name    | usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+   192.168.33.105|  30  16  24  21   0   9| 295M    0 | 843M  807M|   0     0 |  97k   92k
+   192.168.33.106|  31  16  26  17   0   9| 299M    0 | 829M  829M|   0     0 |  88k   80k
+   192.168.33.107|  36  17  19  18   0   9| 290M    0 | 792M  846M|   0     0 |  82k   70k
    ```
 
    Testing with mixed mode for near 'real workload'.
@@ -483,20 +542,22 @@ Pay attention to the NOTICE after install this package. You can read it again by
     * http://192.168.33.106:9000:  356.36 MiB/s, 61.36 obj/s (59.997s, starting 19:37:29 EST)
     * http://192.168.33.107:9000:  347.01 MiB/s, 62.33 obj/s (59.992s, starting 19:37:29 EST)
 
-   Every 5.0s: /opt/vertica/bin/mondb.sh                         Wed Feb 26 19:35:16 2020
 
-   192.168.33.105: usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
-   192.168.33.105:  62  13  17   3   0   5|   0   459M| 454M  452M|   0     0 |  43k   20k
-   192.168.33.106:  64  17  10   2   0   6|   0   461M| 440M  445M|   0     0 |  40k   16k
-   192.168.33.107:  61  15  16   2   0   6|   0   463M| 443M  437M|   0     0 |  47k   21k
-   192.168.33.105: usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
-   192.168.33.105:  43  14  12  25   0   6| 274M  145M| 575M  555M|   0     0 |  72k   61k
-   192.168.33.106:  42  19   6  25   0   8| 278M  146M| 570M  568M|   0     0 |  66k   53k
-   192.168.33.107:  45  15  10  22   0   8| 274M  145M| 553M  545M|   0     0 |  71k   57k
-   192.168.33.105: usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
-   192.168.33.105:  44  14  23  14   0   5| 145M  200M| 485M  560M|   0     0 |  60k   48k
-   192.168.33.106:  44  18  12  18   0   8| 147M  205M| 549M  517M|   0     0 |  61k   44k
-   192.168.33.107:  41  15  15  24   0   6| 143M  202M| 506M  493M|   0     0 |  65k   54k
+    -----node---   ----total-cpu-usage---  -dsk/total- -net/total- ---paging-- ---system--
+         name    | usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+   192.168.33.105|  62  13  17   3   0   5|   0   459M| 454M  452M|   0     0 |  43k   20k
+   192.168.33.106|  64  17  10   2   0   6|   0   461M| 440M  445M|   0     0 |  40k   16k
+   192.168.33.107|  61  15  16   2   0   6|   0   463M| 443M  437M|   0     0 |  47k   21k
+    -----node---   ----total-cpu-usage---  -dsk/total- -net/total- ---paging-- ---system--
+         name    | usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+   192.168.33.105|  43  14  12  25   0   6| 274M  145M| 575M  555M|   0     0 |  72k   61k
+   192.168.33.106|  42  19   6  25   0   8| 278M  146M| 570M  568M|   0     0 |  66k   53k
+   192.168.33.107|  45  15  10  22   0   8| 274M  145M| 553M  545M|   0     0 |  71k   57k
+    -----node---   ----total-cpu-usage---  -dsk/total- -net/total- ---paging-- ---system--
+         name    | usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+   192.168.33.105|  44  14  23  14   0   5| 145M  200M| 485M  560M|   0     0 |  60k   48k
+   192.168.33.106|  44  18  12  18   0   8| 147M  205M| 549M  517M|   0     0 |  61k   44k
+   192.168.33.107|  41  15  15  24   0   6| 143M  202M| 506M  493M|   0     0 |  65k   54k
    ```
 
 3. testing for throughput-concurrence curve
