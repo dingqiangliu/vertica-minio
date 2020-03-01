@@ -5,7 +5,7 @@ curDir="$(pwd)"
 repo_dir="$(cd "$(dirname $0)"; pwd)"
 
 if [ ! -f "${repo_dir}/SOURCES/bin/minio" -o ! -f "${repo_dir}/SOURCES/bin/mc" ] ; then
-    echo "Get the latest release of minio/mc ..."
+    echo "Get the latest release of minio/mc/warp ..."
 
     [ -f "${repo_dir}/SOURCES/bin/minio" ] && rm -rf "${repo_dir}/SOURCES/bin/minio"
     URL_MINIO="https://dl.minio.io/server/minio/release/linux-amd64/archive"
@@ -38,18 +38,21 @@ if [ ! -f "${repo_dir}/SOURCES/bin/minio" -o ! -f "${repo_dir}/SOURCES/bin/mc" ]
     chmod a+x "${repo_dir}/SOURCES/bin/mc"
 
     [ -f "${repo_dir}/SOURCES/bin/warp" ] && rm -rf "${repo_dir}/SOURCES/bin/warp"
-    VER_WARP="$(curl -s "https://api.github.com/repos/minio/warp/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')"
+    VER_WARP="$(curl -s -L "https://github.com/minio/warp/releases/latest" | grep _Linux_amd64.tar.gz | grep href | sed 's/^[^"]*"\([^"]*\).*$/\1/g')"
     if [ -z "${VER_WARP}" ] ; then
         echo "get the latest release version of warp failed!" >&2
         exit 1
     fi
-    URL_WARP="https://github.com/minio/warp/releases/download/v${VER_WARP}/warp_${VER_WARP}_Linux_amd64.tar.gz"
+    URL_WARP="https://github.com/${VER_WARP}"
     echo "downding [${URL_WARP}] ..."
     if ! curl -L -o "${repo_dir}/SOURCES/bin/warp.tgz" ${URL_WARP} ; then
-        echo "downloaded warp is not correct!" >&2
+        echo "downloaded warp is failed!" >&2
         exit 1
     fi
-    tar -xzvf warp.tgz warp
+    if ! tar -C "${repo_dir}/SOURCES/bin/" -xzvf "${repo_dir}/SOURCES/bin/warp.tgz" warp ; then
+        echo "${repo_dir}/SOURCES/bin/warp.tgz is not correct!" >&2
+        exit 1
+    fi
     [ -f "${repo_dir}/SOURCES/bin/warp.tgz" ] && rm -rf "${repo_dir}/SOURCES/bin/warp.tgz"
     chmod a+x "${repo_dir}/SOURCES/bin/warp"
 fi
