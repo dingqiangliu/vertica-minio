@@ -87,6 +87,14 @@ EOF
 
 
 %preun
+PIDS=$(pgrep "^minio$")
+if [ -n "${PIDS}" ] ; then
+  echo "ERROR: minio service still running."
+  echo "ERROR: You must stop them prior to uninstall, eg. sudo systemctl stop minio.service ."
+  echo ${PIDS}
+  exit 1
+fi
+
 [ -h /etc/profile.d/clustercli.sh ] && rm -rf /etc/profile.d/clustercli.sh 
 
 %if 0%{?rhel} >= 7
