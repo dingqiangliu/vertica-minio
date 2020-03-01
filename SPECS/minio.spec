@@ -44,6 +44,13 @@ rm -rf %{buildroot}
 
 %prep
 %setup -q -T -c
+PIDS=$(pgrep "^minio$") || true
+if [ -n "${PIDS}" ] ; then
+  echo "ERROR: minio service still running."
+  echo "ERROR: You must stop them prior to uninstall, eg. sudo systemctl stop minio.service ."
+  echo ${PIDS}
+  exit 1
+fi
 
 
 %install
@@ -95,7 +102,11 @@ if [ -n "${PIDS}" ] ; then
   exit 1
 fi
 
-[ -h /etc/profile.d/clustercli.sh ] && rm -rf /etc/profile.d/clustercli.sh 
+# real uninstall, not an upgrade
+if [ $1 = 0 ]; then
+  # erase
+  [ -h /etc/profile.d/clustercli.sh ] && rm -rf /etc/profile.d/clustercli.sh
+fi
 
 %if 0%{?rhel} >= 7
 %systemd_preun minio.service
