@@ -38,7 +38,7 @@ if [ ! -f "${repo_dir}/SOURCES/bin/minio" -o ! -f "${repo_dir}/SOURCES/bin/mc" ]
     chmod a+x "${repo_dir}/SOURCES/bin/mc"
 
     [ -f "${repo_dir}/SOURCES/bin/warp" ] && rm -rf "${repo_dir}/SOURCES/bin/warp"
-    VER_WARP="$(curl -s -L "https://github.com/minio/warp/releases/latest" | grep _Linux_amd64.tar.gz | grep href | sed 's/^[^"]*"\([^"]*\).*$/\1/g')"
+    VER_WARP="$(curl -s -L "https://github.com/minio/warp/releases/latest" | grep _Linux_x86_64.tar.gz | grep href | sed 's/^[^"]*"\([^"]*\).*$/\1/g')"
     if [ -z "${VER_WARP}" ] ; then
         echo "get the latest release version of warp failed!" >&2
         exit 1
