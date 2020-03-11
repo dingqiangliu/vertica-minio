@@ -207,7 +207,7 @@ All you need to do is just running `make`. It will download the latest versions 
    [192.168.33.107] MINIO_SECRET_KEY="verticas3"
    ```
 
-6. satrt Minio service
+6. start Minio service
 
    ```BASH
    [adminUser ~]# cls_run --background sudo systemctl start minio.service
