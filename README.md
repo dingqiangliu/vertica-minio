@@ -62,7 +62,7 @@ It will save your time to setup and maintain Minio cluster.
 
   * automatically get cluster members from /opt/vertica/bin/clustercli.sh, same as **cls_run** and **cls_cp**.
 
-  * automatically get configurations of Minio service come from `/opt/vertica/config/minio.conf`.
+  * automatically get configurations of Minio service from `/opt/vertica/config/minio.conf`.
 
   * show timestamp and node name, support `--output csvFile` to export all measures for later analysis.
 
@@ -312,7 +312,7 @@ All you need to do is just running `make`. It will download the latest versions 
 
 ### Example 2: benchmark S3 storage
 
-1. vioperf on filesystem, and vioperf on networking
+1. throughput of filesystem and networking
 
    ```BASH
    [dbadmin ~]# cls_run -b -p /opt/vertica/bin/vioperf /home 2>/dev/null
@@ -376,7 +376,7 @@ All you need to do is just running `make`. It will download the latest versions 
    2020-02-26_23:36:07,335 | tcp-throughput    | 2048              | average          | 1069.25     | 1067.93     | 1123046741          | 1121648640          | 1.00165
    ```
 
-2. warp on s3
+2. throughput of s3
 
    Testing PUT and GET with concurrence.
 
@@ -560,7 +560,7 @@ All you need to do is just running `make`. It will download the latest versions 
    192.168.33.107|  41  15  15  24   0   6| 143M  202M| 506M  493M|   0     0 |  65k   54k
    ```
 
-3. testing for throughput-concurrence curve
+3. throughput-concurrence curve
 
    ```BASH
    [dbadmin ~]# for ((n=1; n<=2*$(lscpu | egrep '^CPU\(s\):' | awk '{print $2}'); n++)) ; do warp mixed --duration=1m --warp-client=192.168.33.{105...107} --host=192.168.33.{105...107}:9000 --obj.size 10M -concurrent=${n} --access-key=dbadmin --secret-key=verticas3 ; done | grep  "Cluster Total"
